@@ -16,5 +16,11 @@ module.exports = Object.freeze({
         width: 1,
         height: 1,
         overflow: 'hidden'
+      },
+
+      ellipsisText: {
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden'
       }
   });

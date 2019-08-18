@@ -25,7 +25,7 @@ class IndexPage extends React.Component {
     
     this.handleChange = this.handleChange.bind(this);
     this.handleListClick = this.handleListClick.bind(this);
-    this.fetchData = _.throttle(this.fetchData.bind(this), 400, false);
+    this.fetchData = _.throttle(this.fetchData.bind(this), 900, false);
   }
 
   resetCriptoValue = () => {
@@ -64,6 +64,15 @@ class IndexPage extends React.Component {
     } else {
       this.resetCriptoValue();
     }
+
+    /* 
+    TODO: Handle the live update with one socket
+    TODO: Handle the back button keeping the criptoData updated (the logic here needs adjustment)
+    const pricesWs = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum,monero,litecoin')
+
+    pricesWs.onmessage = function (msg) {
+        console.log(msg.data)
+    } */
 
   }
 

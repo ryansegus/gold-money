@@ -19,7 +19,10 @@ const MainTable = props => {
     */
   <div className={componentClass}>
     <div className={`${componentClass}__headers`}>
-      <div className={`${componentClass}__header -rank`}>rank</div>
+      <div className={`${componentClass}__header -rank`}>
+        {/* I think it will be better to pass all the header buttons as components to handle the up | down state and hide | show the arrow */}
+        <button onClick={props.sortByRank} className={`${componentClass}__headerBtn`}>rank</button>
+      </div>
       <div className={`${componentClass}__header -symbol -visibleMd`}>symbol</div>
       <div className={`${componentClass}__header -name`}>name</div>
       <div className={`${componentClass}__header -price`}>price</div>
@@ -66,6 +69,23 @@ const MainTable = props => {
   display: none;
 }
 
+.c-table__headerBtn {
+  display: inline-block;
+  background: transparent;
+  color: white;
+  border: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.c-table__headerBtn.-up:after {
+  content: " \\2191"
+}
+
+.c-table__headerBtn.-down:after {
+  content: " \\2193"
+}
+
 .c-table__criptoRow {
   display: grid;
   grid-template-columns: repeat(3, minmax(70px, 1fr));
@@ -82,6 +102,10 @@ const MainTable = props => {
   overflow: hidden;
   padding: 5px;
   font-size: 13px;
+}
+
+.c-table__content.-price {
+  text-align:right;
 }
 
 .-decrease {
@@ -108,11 +132,11 @@ const MainTable = props => {
 @media screen and (min-width: 768px) {
   
   .c-table__headers {
-    grid-template-columns: 60px 80px repeat(6,minmax(70px,1fr));
+    grid-template-columns: 80px 80px repeat(6,minmax(70px,1fr));
   }
   
   .c-table__criptoRow {
-    grid-template-columns: 60px 80px repeat(6,minmax(70px,1fr));
+    grid-template-columns: 80px 80px repeat(6,minmax(70px,1fr));
   }
   
   .c-table__header.-visibleMd {

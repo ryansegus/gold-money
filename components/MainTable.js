@@ -104,6 +104,10 @@ const MainTable = props => {
   font-size: 13px;
 }
 
+.c-table__content.-price {
+  text-align:right;
+}
+
 .-decrease {
   color: #e60700;
 }

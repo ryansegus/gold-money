@@ -6,6 +6,7 @@
 import Layout from '../components/MyLayout';
 import fetch from 'isomorphic-unfetch';
 import _ from 'lodash';
+import WebSocketClass from '../shared/WebSocketClass';
 
 // components
 import AutoCompleteList from '../components/AutoCompleteList';
@@ -18,13 +19,12 @@ class IndexPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      q: false,
       criptoData: [],
       availableCriptos: [],
       sortBy: 'name-asc',
-      sortOrderUp: true
+      sortOrderUp: false
     };
-    
+
     this.handleChange = this.handleChange.bind(this);
     this.handleListClick = this.handleListClick.bind(this);
     this.fetchData = _.throttle(this.fetchData.bind(this), 900, false);
@@ -77,7 +77,6 @@ class IndexPage extends React.Component {
   handleListClick = (event) => {
     const str = event.target.dataset.key
     this.resetAvailableCriptos();
-    this.setState({q: str});
     document.getElementById('searchField').value = str;
 
     this.fetchCriptoData(str)
@@ -107,15 +106,6 @@ class IndexPage extends React.Component {
       this.resetAvailableCriptos();
     }
 
-    /* 
-    TODO: Handle the live update with one socket
-    TODO: Handle the back button keeping the criptoData updated (the logic here needs adjustment)
-    const pricesWs = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum,monero,litecoin')
-
-    pricesWs.onmessage = function (msg) {
-        console.log(msg.data)
-    } */
-
   }
 
   fetchCriptoData = async (str) => {
@@ -123,8 +113,39 @@ class IndexPage extends React.Component {
     const json = await res.json()
     
     this.setState({criptoData: this.state.criptoData.concat(json.data)})
+
+    /* TODO: Handle the live update with one socket
+    TODO: Handle the back button keeping the criptoData updated (the logic here needs adjustment) */
+    this.connectToWS()
     
   }
+
+  handlePricesUpdateCB = (prices) => {
+    // Update prices on each coin of the table
+    const data = JSON.parse(prices)
+    let newCriptoDataState = this.state.criptoData.slice(0);
+    
+    Object.entries(data).forEach(([id, price]) => {
+      let indexFound = newCriptoDataState.findIndex(el => el.id === id)
+      let oldPrice = parseFloat(newCriptoDataState[indexFound].priceUsd)
+      let newPrice = parseFloat(price)
+      
+      newCriptoDataState[indexFound].priceUsd = price
+      newCriptoDataState[indexFound].increasing = oldPrice < newPrice
+      
+    });
+
+    this.setState({criptoData: newCriptoDataState});
+    
+  }
+  connectToWS() {
+    const loadedKeys = this.state.criptoData.map(entry => entry.id).join()
+    const webSocketURL = `wss://ws.coincap.io/prices?assets=${loadedKeys}`
+    
+    WebSocketClass.connectToWs(webSocketURL, this.handlePricesUpdateCB)
+
+  }
+  
   handleChange(event) {
     this.fetchData(event.target.value);
   }
@@ -133,6 +154,7 @@ class IndexPage extends React.Component {
     return (
       <Layout>
       <h1>Criptovalues App</h1>
+      <button onClick={WebSocketClass.closeWs}>Disconnect WS</button>
       <label htmlFor='searchField' style={ConstantsClasses.seoHidden}>Label</label>
       <input type="text"
       id='searchField'

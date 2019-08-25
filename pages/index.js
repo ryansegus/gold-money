@@ -7,6 +7,7 @@ import Layout from '../components/MyLayout';
 import fetch from 'isomorphic-unfetch';
 import _ from 'lodash';
 import WebSocketClass from '../shared/WebSocketClass';
+import { setArrowClasses } from '../shared/SortFunctions';
 
 // components
 import AutoCompleteList from '../components/AutoCompleteList';
@@ -45,18 +46,6 @@ class IndexPage extends React.Component {
       sortBy: sort})
   }
 
-  setArrowClasses(target, arrow) {
-    /* This is a good start, we need to add some logic like when the array < 2  */
-    if (arrow === '-up') {
-      target.classList.remove('-down')
-      target.classList.add('-up')
-      
-    } else {
-      target.classList.remove('-up')
-      target.classList.add('-down')
-    }
-  }
-
   sortByRank = (e, sortBy) => {
     const criptoData = this.state.criptoData
     this.setState({sortOrderUp: this.state.sortOrderUp = !this.state.sortOrderUp})
@@ -65,7 +54,7 @@ class IndexPage extends React.Component {
     this.state.sortOrderUp ? a.rank-b.rank : b.rank-a.rank
     )
 
-    this.state.sortOrderUp ? this.setArrowClasses(e.target, '-up') : this.setArrowClasses(e.target, '-down')
+    this.state.sortOrderUp ? setArrowClasses(e.target, '-up') : setArrowClasses(e.target, '-down')
 
     this.updateStateSorting(sortedCriptoData, sortBy)
   }
